@@ -34,12 +34,20 @@ export default function Reader({ text, onReset }) {
       if (e.code === "Space") {
         e.preventDefault();
         setIsPlaying((prev) => !prev);
+      } else if (e.code === "ArrowLeft") {
+        e.preventDefault();
+        setIsPlaying(false);
+        setIndex((prev) => Math.max(prev - 1, 0));
+      } else if (e.code === "ArrowRight") {
+        e.preventDefault();
+        setIsPlaying(false);
+        setIndex((prev) => Math.min(prev + 1, words.length - 1));
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [words.length]);
 
   return (
     <div>
