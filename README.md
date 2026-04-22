@@ -18,3 +18,4 @@ A speed-reading web app inspired by RSVP (Rapid Serial Visual Presentation).
 ```bash
 npm install
 npm run dev
+```
