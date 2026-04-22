@@ -36,9 +36,6 @@ export default function App() {
         <div className={`app-brand ${chromeVisible ? "" : "is-faded"}`.trim()}>
           Q Read
         </div>
-        <p className={`app-tagline ${chromeVisible ? "" : "is-faded"}`.trim()}>
-          A focused speed-reading interface for pasted text and uploaded files.
-        </p>
       </header>
 
       {!text ? (
