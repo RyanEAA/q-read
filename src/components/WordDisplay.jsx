@@ -1,14 +1,7 @@
 export default function WordDisplay({ word }) {
   if (!word) return null;
 
-  const pivot =
-    word.length <= 2
-      ? 0
-      : word.length <= 5
-      ? 1
-      : word.length <= 9
-      ? 2
-      : Math.floor(word.length / 2);
+  const pivot = Math.floor(word.length / 2);
 
   return (
     <div className="reader-container">
