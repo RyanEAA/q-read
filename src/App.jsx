@@ -5,6 +5,7 @@ import { parseFile } from "./utils/fileParser";
 export default function App() {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [chromeVisible, setChromeVisible] = useState(true);
 
   // 📄 Handle file upload (TXT + PDF)
   const handleFileUpload = async (e) => {
@@ -26,36 +27,58 @@ export default function App() {
   // 🔁 Reset back to upload screen
   const handleReset = () => {
     setText("");
+    setChromeVisible(true);
   };
 
   return (
-    <div>
+    <div className="app-shell">
+      <header className="app-header">
+        <div className={`app-brand ${chromeVisible ? "" : "is-faded"}`.trim()}>
+          Q Read
+        </div>
+        <p className={`app-tagline ${chromeVisible ? "" : "is-faded"}`.trim()}>
+          A focused speed-reading interface for pasted text and uploaded files.
+        </p>
+      </header>
+
       {!text ? (
-        <div className="upload">
-          <div>
-            {/* ✏️ Paste text */}
+        <main className="upload">
+          <section className="upload-card">
+            <div className="upload-copy">
+              <h1>Paste or upload your text</h1>
+              <p>
+                Q Read keeps one word centered at a time, with keyboard shortcuts
+                for fast navigation.
+              </p>
+            </div>
+
             <textarea
               className="textarea"
               placeholder="Paste your text here..."
               onChange={(e) => setText(e.target.value)}
             />
 
-            {/* 📂 Upload file */}
-            <div style={{ marginTop: "20px", color: "white" }}>
-              <p>Or upload a file:</p>
+            <div className="upload-actions">
+              <p className="upload-label">Or upload a file</p>
 
               <input
                 type="file"
                 accept=".txt,.pdf"
                 onChange={handleFileUpload}
+                className="file-input"
               />
 
-              {loading && <p>Processing file...</p>}
+              {loading && <p className="upload-status">Processing file...</p>}
             </div>
-          </div>
-        </div>
+          </section>
+        </main>
       ) : (
-        <Reader text={text} onReset={handleReset} />
+        <Reader
+          text={text}
+          onReset={handleReset}
+          chromeVisible={chromeVisible}
+          setChromeVisible={setChromeVisible}
+        />
       )}
     </div>
   );

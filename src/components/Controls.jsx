@@ -1,6 +1,6 @@
-export default function Controls({ wpm, setWpm, isPlaying, setIsPlaying, setIndex }) {
+export default function Controls({ className = "", wpm, setWpm, isPlaying, setIsPlaying, setIndex }) {
   return (
-    <div className="controls">
+    <div className={`controls ${className}`.trim()}>
     <button onClick={() => setIsPlaying(!isPlaying)}>
         {isPlaying ? "Pause" : "Play"}
     </button>

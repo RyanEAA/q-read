@@ -3,7 +3,7 @@ import WordDisplay from "./WordDisplay";
 import Controls from "./Controls";
 import { splitWords, getDelay } from "../utils/textParser";
 
-export default function Reader({ text, onReset }) {
+export default function Reader({ text, onReset, chromeVisible, setChromeVisible }) {
   const words = splitWords(text);
 
   const [index, setIndex] = useState(0);
@@ -70,6 +70,14 @@ export default function Reader({ text, onReset }) {
   const [isEditingWord, setIsEditingWord] = useState(false);
   const [wordInputValue, setWordInputValue] = useState(String(index + 1));
 
+  useEffect(() => {
+    setChromeVisible(index < 5);
+  }, [index]);
+
+  const handleCursorMove = () => {
+    setChromeVisible(true);
+  };
+
   const handleWordInputChange = (e) => {
     setWordInputValue(e.target.value);
   };
@@ -99,13 +107,13 @@ export default function Reader({ text, onReset }) {
   };
 
   return (
-    <div>
+    <div className="reader-screen" onMouseMove={handleCursorMove} onMouseEnter={handleCursorMove}>
       <button className="back-button" onClick={onReset}>
         ← Back
       </button>
       <WordDisplay word={words[index]} />
       
-      <div className="progress-container">
+      <div className={`progress-container ${chromeVisible ? "" : "is-faded"}`.trim()}>
         <div className="progress-bar" onClick={handleProgressClick}>
           <div className="progress-fill" style={{ width: `${progress}%` }}></div>
         </div>
@@ -130,12 +138,20 @@ export default function Reader({ text, onReset }) {
       </div>
 
       <Controls
+        className={chromeVisible ? "" : "is-faded"}
         wpm={wpm}
         setWpm={setWpm}
         isPlaying={isPlaying}
         setIsPlaying={setIsPlaying}
         setIndex={setIndex}
       />
+
+      <footer className={`controls-help ${chromeVisible ? "" : "is-faded"}`.trim()}>
+        <span><strong>Space</strong> play / pause</span>
+        <span><strong>← / →</strong> move word by word</span>
+        <span><strong>↑ / ↓</strong> change speed</span>
+        <span><strong>Progress text</strong> jump to a word</span>
+      </footer>
     </div>
   );
 }
