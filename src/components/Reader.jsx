@@ -42,6 +42,12 @@ export default function Reader({ text, onReset }) {
         e.preventDefault();
         setIsPlaying(false);
         setIndex((prev) => Math.min(prev + 1, words.length - 1));
+      } else if (e.code === "ArrowUp") {
+        e.preventDefault();
+        setWpm((prev) => Math.min(prev + 25, 800));
+      } else if (e.code === "ArrowDown") {
+        e.preventDefault();
+        setWpm((prev) => Math.max(prev - 25, 100));
       }
     };
 
