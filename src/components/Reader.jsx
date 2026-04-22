@@ -3,7 +3,7 @@ import WordDisplay from "./WordDisplay";
 import Controls from "./Controls";
 import { splitWords, getDelay } from "../utils/textParser";
 
-export default function Reader({ text }) {
+export default function Reader({ text, onReset }) {
   const words = splitWords(text);
 
   const [index, setIndex] = useState(0);
@@ -31,6 +31,9 @@ export default function Reader({ text }) {
 
   return (
     <div>
+      <button className="back-button" onClick={onReset}>
+        ← Back
+      </button>
       <WordDisplay word={words[index]} />
       <Controls
         wpm={wpm}
