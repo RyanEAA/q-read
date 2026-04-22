@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Reader from "./components/Reader";
-
+import "./index.css";
 export default function App() {
   const [text, setText] = useState("");
 

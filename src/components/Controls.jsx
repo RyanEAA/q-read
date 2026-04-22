@@ -27,15 +27,3 @@ export default function Controls({ wpm, setWpm, isPlaying, setIsPlaying, setInde
     </div>
   );
 }
-
-const styles = {
-  container: {
-    background: "#111",
-    color: "white",
-    padding: "20px",
-    display: "flex",
-    gap: "10px",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-};

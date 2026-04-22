@@ -31,38 +31,3 @@ export default function WordDisplay({ word }) {
     </div>
   );
 }
-
-const styles = {
-  container: {
-    height: "70vh",
-    background: "black",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-  },
-  word: {
-    fontSize: "64px",
-    fontFamily: "serif",
-    zIndex: 2,
-  },
-  guides: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  horizontal: {
-    width: "80%",
-    height: "2px",
-    background: "#333",
-  },
-  vertical: {
-    width: "2px",
-    height: "40%",
-    background: "#333",
-  },
-};
