@@ -29,6 +29,18 @@ export default function Reader({ text, onReset }) {
     return () => clearTimeout(timeout);
   }, [index, isPlaying, wpm]);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.code === "Space") {
+        e.preventDefault();
+        setIsPlaying((prev) => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   return (
     <div>
       <button className="back-button" onClick={onReset}>
