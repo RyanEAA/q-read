@@ -11,14 +11,14 @@ export default function WordDisplay({ word }) {
       : Math.floor(word.length / 2);
 
   return (
-    <div style={styles.container}>
-      <div style={styles.guides}>
-        <div style={styles.horizontal}></div>
-        <div style={styles.vertical}></div>
-        <div style={styles.horizontal}></div>
+    <div className="reader-container">
+      <div className="guides">
+        <div className="horizontal"></div>
+        <div className="vertical"></div>
+        <div className="horizontal"></div>
       </div>
 
-      <div style={styles.word}>
+      <div className="word">
         {word.split("").map((char, i) => (
           <span
             key={i}

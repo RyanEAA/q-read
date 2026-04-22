@@ -1,29 +1,30 @@
 export default function Controls({ wpm, setWpm, isPlaying, setIsPlaying, setIndex }) {
   return (
-    <div style={styles.container}>
-      <button onClick={() => setIsPlaying(!isPlaying)}>
+    <div className="controls">
+    <button onClick={() => setIsPlaying(!isPlaying)}>
         {isPlaying ? "Pause" : "Play"}
-      </button>
+    </button>
 
-      <button
+    <button
         onClick={() => {
-          setIsPlaying(false);
-          setIndex(0);
+        setIsPlaying(false);
+        setIndex(0);
         }}
-      >
+    >
         Restart
-      </button>
+    </button>
 
-      <div>
-        <label>WPM: {wpm}</label>
+    <div className="slider-group">
+        <span className="wpm-label">WPM: {wpm}</span>
+
         <input
-          type="range"
-          min="100"
-          max="800"
-          value={wpm}
-          onChange={(e) => setWpm(Number(e.target.value))}
+        type="range"
+        min="100"
+        max="800"
+        value={wpm}
+        onChange={(e) => setWpm(Number(e.target.value))}
         />
-      </div>
+    </div>
     </div>
   );
 }

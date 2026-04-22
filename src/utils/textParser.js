@@ -1,8 +1,11 @@
-export function splitWords(text) {
+export function cleanText(text) {
   return text
     .replace(/\s+/g, " ")
-    .trim()
-    .split(" ");
+    .trim();
+}
+
+export function splitWords(text) {
+  return cleanText(text).split(" ");
 }
 
 export function getPivotIndex(word) {

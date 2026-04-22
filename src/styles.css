@@ -64,11 +64,69 @@ html, body, #root {
 
 /* CONTROLS */
 .controls {
-  background: #111;
-  color: white;
-  padding: 20px;
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  background: rgba(20, 20, 20, 0.9);
+  backdrop-filter: blur(10px);
+
+  padding: 15px 25px;
+  border-radius: 12px;
+
   display: flex;
-  gap: 10px;
   align-items: center;
-  justify-content: space-between;
+  gap: 20px;              /* spacing between items */
+
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+button {
+  background: #222;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #333;
+}
+
+input[type="range"] {
+  accent-color: #ff4d4d;
+}
+
+.word {
+  font-size: 72px;
+  font-family: "Georgia", serif;
+  letter-spacing: 2px;
+}
+
+.upload {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-box {
+  text-align: center;
+}
+
+.textarea {
+  width: 300px;
+  height: 200px;
+  border-radius: 10px;
+  border: none;
+  padding: 15px;
+  font-size: 16px;
+}
+
+.wpm-label {
+  color: white;
+  font-size: 14px;
 }
