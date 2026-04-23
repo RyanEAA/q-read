@@ -16,7 +16,7 @@ A speed-reading web app inspired by RSVP (Rapid Serial Visual Presentation).
 ## Getting Started
 
 ```bash
-git clone https://github.com/yourusername/q-read.git
+git clone https://github.com/RyanEAA/q-read.git
 cd q-read
 npm install
 npm run dev
