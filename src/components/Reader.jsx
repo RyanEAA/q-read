@@ -19,16 +19,17 @@ export default function Reader({ text, onReset, chromeVisible, setChromeVisible 
     const timeout = setTimeout(() => {
       setIndex((prev) => {
         if (prev + 1 >= words.length) {
-            setIsPlaying(false); // stop playback
-            return prev;         // stay on last word
+          setIsPlaying(false); // stop playback
+          return prev;         // stay on last word
         }
         return prev + 1;
-        });
+      });
     }, getDelay(word, baseDelay));
 
     return () => clearTimeout(timeout);
   }, [index, isPlaying, wpm]);
 
+  // This is where we handle the: play/pause, move word, and change speed keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.code === "Space") {
@@ -89,7 +90,7 @@ export default function Reader({ text, onReset, chromeVisible, setChromeVisible 
       setIsEditingWord(false);
       return;
     }
-    
+
     let wordNum = parseInt(value, 10);
     wordNum = Math.max(1, Math.min(wordNum, words.length));
     setIndex(wordNum - 1);
@@ -112,12 +113,12 @@ export default function Reader({ text, onReset, chromeVisible, setChromeVisible 
         ← Back
       </button>
       <WordDisplay word={words[index]} />
-      
+
       <div className={`progress-container ${chromeVisible ? "" : "is-faded"}`.trim()}>
         <div className="progress-bar" onClick={handleProgressClick}>
           <div className="progress-fill" style={{ width: `${progress}%` }}></div>
         </div>
-        
+
         {isEditingWord ? (
           <input
             type="number"
@@ -139,6 +140,8 @@ export default function Reader({ text, onReset, chromeVisible, setChromeVisible 
 
       <Controls
         className={chromeVisible ? "" : "is-faded"}
+        words={words}
+        index={index}
         wpm={wpm}
         setWpm={setWpm}
         isPlaying={isPlaying}

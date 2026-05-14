@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Reader from "./components/Reader";
 import { parseFile } from "./utils/fileParser";
+// import { speechSynthesis }
 
 export default function App() {
   const [text, setText] = useState("");
@@ -24,6 +25,7 @@ export default function App() {
     }
   };
 
+  // change this to restart when a button is clicked, when the user wants to upload a new file
   // 🔁 Reset back to upload screen
   const handleReset = () => {
     setText("");
