@@ -1,7 +1,19 @@
 import { useSpeech } from "react-text-to-speech";
 import { useEffect, useState, useMemo } from "react";
 
-export default function Controls({ className = "", words, index, wpm, setWpm, isPlaying, setIsPlaying, setIndex }) {
+export default function Controls({
+    className = "",
+    words,
+    index,
+    wpm,
+    setWpm,
+    isPlaying,
+    setIsPlaying,
+    setIndex,
+    hasPdf = false,
+    isFocusMode = false,
+    setIsFocusMode,
+}) {
 
     const word = words[index];
 
@@ -67,6 +79,14 @@ export default function Controls({ className = "", words, index, wpm, setWpm, is
                     </option>
                 ))}
             </select> */}
+
+            {hasPdf && setIsFocusMode && (
+                <button
+                    onClick={() => setIsFocusMode((prev) => !prev)}
+                >
+                    {isFocusMode ? "Focus Off" : "Focus On"}
+                </button>
+            )}
 
             <label className="switch">
                 <input

@@ -5,6 +5,8 @@ import { parseFile } from "./utils/fileParser";
 
 export default function App() {
   const [text, setText] = useState("");
+  const [pdfDoc, setPdfDoc] = useState(null);
+  const [pdfWords, setPdfWords] = useState([]);
   const [loading, setLoading] = useState(false);
   const [chromeVisible, setChromeVisible] = useState(true);
 
@@ -15,8 +17,10 @@ export default function App() {
 
     try {
       setLoading(true);
-      const extractedText = await parseFile(file);
-      setText(extractedText);
+      const parsed = await parseFile(file);
+      setText(parsed.text);
+      setPdfDoc(parsed.pdfDoc);
+      setPdfWords(parsed.pdfWords);
     } catch (err) {
       console.error(err);
       alert("Error reading file");
@@ -29,6 +33,8 @@ export default function App() {
   // 🔁 Reset back to upload screen
   const handleReset = () => {
     setText("");
+    setPdfDoc(null);
+    setPdfWords([]);
     setChromeVisible(true);
   };
 
@@ -54,7 +60,11 @@ export default function App() {
             <textarea
               className="textarea"
               placeholder="Paste your text here..."
-              onChange={(e) => setText(e.target.value)}
+              onChange={(e) => {
+                setText(e.target.value);
+                setPdfDoc(null);
+                setPdfWords([]);
+              }}
             />
 
             <div className="upload-actions">
@@ -74,6 +84,8 @@ export default function App() {
       ) : (
         <Reader
           text={text}
+          pdfDoc={pdfDoc}
+          pdfWords={pdfWords}
           onReset={handleReset}
           chromeVisible={chromeVisible}
           setChromeVisible={setChromeVisible}

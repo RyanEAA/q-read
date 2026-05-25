@@ -1,5 +1,6 @@
 import * as pdfjsLib from "pdfjs-dist/build/pdf";
 import pdfWorker from "pdfjs-dist/build/pdf.worker?url";
+import { extractWordsFromPdf } from "./pdfTextExtractor";
 import { cleanText } from "./textParser";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
@@ -10,26 +11,29 @@ export async function parseFile(file) {
   }
 
   if (file.type === "text/plain") {
-    return cleanText(await file.text());
+    return {
+      text: cleanText(await file.text()),
+      pdfDoc: null,
+      pdfWords: [],
+    };
   }
 
   throw new Error("Unsupported file type");
 }
 
 async function parsePDF(file) {
-  const pdf = await pdfjsLib.getDocument(URL.createObjectURL(file)).promise;
+  const objectUrl = URL.createObjectURL(file);
 
-  let text = "";
+  try {
+    const pdfDoc = await pdfjsLib.getDocument(objectUrl).promise;
+    const pdfWords = await extractWordsFromPdf(pdfDoc);
 
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const content = await page.getTextContent();
-
-    const pageText = content.items.map((item) => item.str).join(" ");
-    text += pageText + " ";
+    return {
+      text: cleanText(pdfWords.map((word) => word.text).join(" ")),
+      pdfDoc,
+      pdfWords,
+    };
+  } finally {
+    URL.revokeObjectURL(objectUrl);
   }
-
-  text = text.replace(/\s+/g, " ").trim(); // Clean up whitespace
-
-  return cleanText(text);
 }

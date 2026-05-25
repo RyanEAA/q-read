@@ -123,6 +123,7 @@ html, body, #root {
 .reader-screen {
   min-height: 100vh;
   padding-bottom: 170px;
+  position: relative;
 }
 
 .reader-container {
@@ -132,6 +133,22 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   position: relative;
+}
+
+.reader-container.word-display-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  height: auto;
+}
+
+.reader-container.word-display-overlay .guides {
+  opacity: 0.35;
+}
+
+.reader-container.word-display-overlay .word {
+  text-shadow: 0 0 24px rgba(0, 0, 0, 0.55);
 }
 
 .word {
@@ -225,6 +242,43 @@ input[type="range"] {
   font-size: 14px;
   transition: 0.2s;
   z-index: 1000;
+}
+
+.pdf-viewer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 104px 24px 220px;
+}
+
+.pdf-page {
+  position: relative;
+  margin: 0 auto;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #fff;
+}
+
+.pdf-page canvas {
+  display: block;
+}
+
+.word-highlight {
+  position: absolute;
+  border-radius: 4px;
+  background: rgba(255, 77, 77, 0.2);
+  outline: 2px solid rgba(255, 77, 77, 0.9);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.pdf-empty {
+  min-height: 48vh;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 1.05rem;
 }
 
 /* PROGRESS BAR */

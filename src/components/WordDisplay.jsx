@@ -1,10 +1,10 @@
-export default function WordDisplay({ word }) {
+export default function WordDisplay({ word, className = "" }) {
   if (!word) return null;
 
   const pivot = Math.floor(word.length / 2);
 
   return (
-    <div className="reader-container">
+    <div className={`reader-container ${className}`.trim()}>
       <div className="guides">
         <div className="horizontal"></div>
         <div className="vertical"></div>

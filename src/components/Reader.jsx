@@ -1,14 +1,23 @@
 import { useEffect, useState } from "react";
 import WordDisplay from "./WordDisplay";
 import Controls from "./Controls";
+import PDFViewer from "./PDFViewer";
 import { splitWords, getDelay } from "../utils/textParser";
 
-export default function Reader({ text, onReset, chromeVisible, setChromeVisible }) {
+export default function Reader({
+  text,
+  pdfDoc,
+  pdfWords = [],
+  onReset,
+  chromeVisible,
+  setChromeVisible,
+}) {
   const words = splitWords(text);
 
   const [index, setIndex] = useState(0);
   const [wpm, setWpm] = useState(300);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isFocusMode, setIsFocusMode] = useState(false);
 
   useEffect(() => {
     if (!isPlaying) return;
@@ -75,6 +84,10 @@ export default function Reader({ text, onReset, chromeVisible, setChromeVisible 
     setChromeVisible(index < 5);
   }, [index]);
 
+  useEffect(() => {
+    setIsFocusMode(false);
+  }, [pdfDoc]);
+
   const handleCursorMove = () => {
     setChromeVisible(true);
   };
@@ -107,12 +120,22 @@ export default function Reader({ text, onReset, chromeVisible, setChromeVisible 
     }
   };
 
+  const activePdfWord = pdfWords[index];
+
   return (
     <div className="reader-screen" onMouseMove={handleCursorMove} onMouseEnter={handleCursorMove}>
       <button className="back-button" onClick={onReset}>
         ← Back
       </button>
-      <WordDisplay word={words[index]} />
+
+      {pdfDoc && !isFocusMode && (
+        <PDFViewer pdfDoc={pdfDoc} activeWord={activePdfWord} />
+      )}
+
+      <WordDisplay
+        word={words[index]}
+        className={pdfDoc && !isFocusMode ? "word-display-overlay" : ""}
+      />
 
       <div className={`progress-container ${chromeVisible ? "" : "is-faded"}`.trim()}>
         <div className="progress-bar" onClick={handleProgressClick}>
@@ -147,6 +170,9 @@ export default function Reader({ text, onReset, chromeVisible, setChromeVisible 
         isPlaying={isPlaying}
         setIsPlaying={setIsPlaying}
         setIndex={setIndex}
+        hasPdf={Boolean(pdfDoc)}
+        isFocusMode={isFocusMode}
+        setIsFocusMode={setIsFocusMode}
       />
 
       <footer className={`controls-help ${chromeVisible ? "" : "is-faded"}`.trim()}>
