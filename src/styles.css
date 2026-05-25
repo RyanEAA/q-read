@@ -126,6 +126,10 @@ html, body, #root {
   position: relative;
 }
 
+.reader-screen.has-word-overlay .pdf-viewer {
+  padding-top: 176px;
+}
+
 .reader-container {
   height: 70vh;
   background: transparent;
@@ -148,7 +152,21 @@ html, body, #root {
 }
 
 .reader-container.word-display-overlay .word {
-  text-shadow: 0 0 24px rgba(0, 0, 0, 0.55);
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  max-width: 100vw;
+  padding: 0.25em 24px 0.45em;
+  border-radius: 0;
+  background: rgba(0, 0, 0, 0.94);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  text-shadow: none;
+  z-index: 6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .word {
@@ -241,7 +259,7 @@ input[type="range"] {
   cursor: pointer;
   font-size: 14px;
   transition: 0.2s;
-  z-index: 1000;
+  z-index: 100;
 }
 
 .pdf-viewer {

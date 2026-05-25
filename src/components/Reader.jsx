@@ -123,7 +123,11 @@ export default function Reader({
   const activePdfWord = pdfWords[index];
 
   return (
-    <div className="reader-screen" onMouseMove={handleCursorMove} onMouseEnter={handleCursorMove}>
+    <div
+      className={`reader-screen ${pdfDoc && !isFocusMode ? "has-word-overlay" : ""}`.trim()}
+      onMouseMove={handleCursorMove}
+      onMouseEnter={handleCursorMove}
+    >
       <button className="back-button" onClick={onReset}>
         ← Back
       </button>
