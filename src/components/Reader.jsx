@@ -44,6 +44,9 @@ export default function Reader({
       if (e.code === "Space") {
         e.preventDefault();
         setIsPlaying((prev) => !prev);
+      } else if (e.code === "KeyF") {
+        e.preventDefault();
+        setIsFocusMode((prev) => !prev);
       } else if (e.code === "ArrowLeft") {
         e.preventDefault();
         setIsPlaying(false);
