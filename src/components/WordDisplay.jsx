@@ -6,7 +6,7 @@ export default function WordDisplay({ word, className = "" }) {
   return (
     <div className={`reader-container ${className}`.trim()}>
       <div className="guides">
-        <div className="horizontal"></div>
+        {/* <div className="horizontal"></div> */}
         <div className="vertical"></div>
         <div className="horizontal"></div>
       </div>
