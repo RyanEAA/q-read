@@ -80,6 +80,12 @@ export default function Reader({
     setIsPlaying(false);
   };
 
+  const handlePdfWordClick = (wordIndex) => {
+    if (typeof wordIndex !== "number") return;
+    setIndex(Math.max(0, Math.min(wordIndex, words.length - 1)));
+    setIsPlaying(false);
+  };
+
   const [isEditingWord, setIsEditingWord] = useState(false);
   const [wordInputValue, setWordInputValue] = useState(String(index + 1));
 
@@ -136,7 +142,12 @@ export default function Reader({
       </button>
 
       {pdfDoc && !isFocusMode && (
-        <PDFViewer pdfDoc={pdfDoc} activeWord={activePdfWord} />
+        <PDFViewer
+          pdfDoc={pdfDoc}
+          activeWord={activePdfWord}
+          words={pdfWords}
+          onWordClick={handlePdfWordClick}
+        />
       )}
 
       <WordDisplay

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { SCALE } from "../utils/pdfTextExtractor";
 
-function PDFPage({ pdfDoc, pageNumber, activeWord }) {
+function PDFPage({ pdfDoc, pageNumber, activeWord, words, onWordClick }) {
   const canvasRef = useRef(null);
 
   const [pageSize, setPageSize] = useState({
@@ -43,6 +43,8 @@ function PDFPage({ pdfDoc, pageNumber, activeWord }) {
   const showHighlight =
     activeWord && activeWord.page === pageNumber;
 
+  const pageWords = words.filter((word) => word.page === pageNumber);
+
   return (
     <div
       className="pdf-page"
@@ -64,6 +66,26 @@ function PDFPage({ pdfDoc, pageNumber, activeWord }) {
           }}
         />
       )}
+
+      {pageWords.map((word, wordIndex) => {
+        const globalIndex = words.indexOf(word);
+
+        return (
+          <button
+            key={`${word.page}-${globalIndex}-${wordIndex}`}
+            type="button"
+            className="pdf-word-hitbox"
+            style={{
+              left: `${word.x}px`,
+              top: `${word.y}px`,
+              width: `${word.width}px`,
+              height: `${word.height}px`,
+            }}
+            aria-label={`Select word ${word.text}`}
+            onClick={() => onWordClick(globalIndex)}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -71,6 +93,8 @@ function PDFPage({ pdfDoc, pageNumber, activeWord }) {
 export default function PDFViewer({
   pdfDoc,
   activeWord,
+  words = [],
+  onWordClick,
   focusMode = false,
 }) {
   if (!pdfDoc) {
@@ -94,6 +118,8 @@ export default function PDFViewer({
           pdfDoc={pdfDoc}
           pageNumber={pageNumber}
           activeWord={activeWord}
+          words={words}
+          onWordClick={onWordClick}
         />
       ))}
     </section>
