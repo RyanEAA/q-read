@@ -56,18 +56,25 @@ If you'd like, I can add a short diagram or keyboard shortcut reference next (e.
 
 ```mermaid
 graph TD
-	U[User] -->|uploads file| App[start App (`src/App.jsx`)]
-	App -->|parseFile| Parser[`src/utils/fileParser.js`]
-	Parser -->|text| Text[text (cleaned)]
-	Parser -->|pdfDoc + pdfWords| PDFData[pdfDoc + pdfWords]
-	App --> Reader[`src/components/Reader.jsx`]
-	Reader --> WordDisplay[`src/components/WordDisplay.jsx`]
-	Reader --> Controls[`src/components/Controls.jsx`]
-	Reader --> PDFViewer[`src/components/PDFViewer.jsx`]
-	PDFData --> PDFViewer
-	Text --> Reader
-	Controls -->|toggle focus / playback| Reader
-	PDFViewer -->|highlight uses| PDFTextExtractor[`src/utils/pdfTextExtractor.js`]
+    U[User] -->|uploads file| App["start App - src/App.jsx"]
+
+    App -->|parseFile| Parser["src/utils/fileParser.js"]
+
+    Parser -->|text| Text["text (cleaned)"]
+    Parser -->|pdfDoc + pdfWords| PDFData["pdfDoc + pdfWords"]
+
+    App --> Reader["src/components/Reader.jsx"]
+
+    Reader --> WordDisplay["src/components/WordDisplay.jsx"]
+    Reader --> Controls["src/components/Controls.jsx"]
+    Reader --> PDFViewer["src/components/PDFViewer.jsx"]
+
+    PDFData --> PDFViewer
+    Text --> Reader
+
+    Controls -->|toggle focus / playback| Reader
+
+    PDFViewer -->|highlight uses| PDFTextExtractor["src/utils/pdfTextExtractor.js"]
 ```
 
 ### Keyboard Shortcuts
