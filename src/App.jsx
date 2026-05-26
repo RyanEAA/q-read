@@ -8,6 +8,7 @@ export default function App() {
   const [pdfDoc, setPdfDoc] = useState(null);
   const [pdfWords, setPdfWords] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingType, setLoadingType] = useState(null);
   const [chromeVisible, setChromeVisible] = useState(true);
 
   // 📄 Handle file upload (TXT + PDF)
@@ -16,6 +17,7 @@ export default function App() {
     if (!file) return;
 
     try {
+      setLoadingType(file.type === "application/pdf" ? "pdf" : "text");
       setLoading(true);
       const parsed = await parseFile(file);
       setText(parsed.text);
@@ -26,6 +28,7 @@ export default function App() {
       alert("Error reading file");
     } finally {
       setLoading(false);
+      setLoadingType(null);
     }
   };
 
@@ -46,7 +49,19 @@ export default function App() {
         </div>
       </header>
 
-      {!text ? (
+      {loading && loadingType === "pdf" ? (
+        <main className="loading-screen" aria-busy="true" aria-live="polite">
+          <section className="loading-card">
+            <div className="loading-spinner" aria-hidden="true" />
+            <p className="loading-kicker">Processing PDF</p>
+            <h1>Preparing your document</h1>
+            <p>
+              Q Read is extracting words and page positions so it can render the
+              PDF preview and highlight the current word.
+            </p>
+          </section>
+        </main>
+      ) : !text ? (
         <main className="upload">
           <section className="upload-card">
             <div className="upload-copy">
@@ -77,7 +92,9 @@ export default function App() {
                 className="file-input"
               />
 
-              {loading && <p className="upload-status">Processing file...</p>}
+              {loading && loadingType !== "pdf" && (
+                <p className="upload-status">Processing file...</p>
+              )}
             </div>
           </section>
         </main>
