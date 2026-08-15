@@ -11,6 +11,37 @@ function splitTextItems(textContent) {
   return words;
 }
 
+async function getTextContentCompat(page) {
+  const reader = page.streamTextContent().getReader();
+
+  const textContent = {
+    items: [],
+    styles: {},
+    lang: null,
+  };
+
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+
+      if (done) {
+        break;
+      }
+
+      if (value.lang != null && textContent.lang == null) {
+        textContent.lang = value.lang;
+      }
+
+      Object.assign(textContent.styles, value.styles);
+      textContent.items.push(...value.items);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  return textContent;
+}
+
 // Build only the lightweight reading index up front.
 // We keep the document text plus one start offset per page, rather than
 // keeping x/y/width/height objects for every word in the whole PDF.
@@ -22,7 +53,7 @@ export async function extractPdfTextIndex(pdfDoc) {
     pageWordStarts.push(words.length);
 
     const page = await pdfDoc.getPage(pageNum);
-    const textContent = await page.getTextContent();
+    const textContent = await getTextContentCompat(page);
     words.push(...splitTextItems(textContent));
 
     // Let PDF.js release page-specific resources as soon as possible.
@@ -45,7 +76,7 @@ export async function extractPdfTextIndex(pdfDoc) {
 export async function extractWordsFromPdfPage(pdfDoc, pageNum) {
   const page = await pdfDoc.getPage(pageNum);
   const viewport = page.getViewport({ scale: SCALE });
-  const textContent = await page.getTextContent();
+  const textContent = await getTextContentCompat(page);
   const words = [];
 
   for (const item of textContent.items) {
