@@ -6,38 +6,46 @@ import { parseFile } from "./utils/fileParser";
 export default function App() {
   const [text, setText] = useState("");
   const [pdfDoc, setPdfDoc] = useState(null);
-  const [pdfWords, setPdfWords] = useState([]);
+  const [pageWordStarts, setPageWordStarts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingType, setLoadingType] = useState(null);
   const [chromeVisible, setChromeVisible] = useState(true);
 
   // 📄 Handle file upload (TXT + PDF)
   const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (!file) return;
 
+    const isPdf =
+      file.type === "application/pdf" ||
+      file.name.toLowerCase().endsWith(".pdf");
+
     try {
-      setLoadingType(file.type === "application/pdf" ? "pdf" : "text");
+      setLoadingType(isPdf ? "pdf" : "text");
       setLoading(true);
+
       const parsed = await parseFile(file);
       setText(parsed.text);
       setPdfDoc(parsed.pdfDoc);
-      setPdfWords(parsed.pdfWords);
+      setPageWordStarts(parsed.pageWordStarts ?? []);
     } catch (err) {
       console.error(err);
-      alert("Error reading file");
+      alert(
+        `Error reading file: ${
+          err instanceof Error ? err.message : String(err)
+        }`
+      );
     } finally {
       setLoading(false);
       setLoadingType(null);
     }
   };
 
-  // change this to restart when a button is clicked, when the user wants to upload a new file
   // 🔁 Reset back to upload screen
   const handleReset = () => {
     setText("");
     setPdfDoc(null);
-    setPdfWords([]);
+    setPageWordStarts([]);
     setChromeVisible(true);
   };
 
@@ -56,8 +64,8 @@ export default function App() {
             <p className="loading-kicker">Processing PDF</p>
             <h1>Preparing your document</h1>
             <p>
-              Q Read is extracting words and page positions so it can render the
-              PDF preview and highlight the current word.
+              Q Read is building a lightweight reading index. PDF page layout
+              will be loaded only around the page you are currently reading.
             </p>
           </section>
         </main>
@@ -78,7 +86,7 @@ export default function App() {
               onChange={(e) => {
                 setText(e.target.value);
                 setPdfDoc(null);
-                setPdfWords([]);
+                setPageWordStarts([]);
               }}
             />
 
@@ -87,7 +95,7 @@ export default function App() {
 
               <input
                 type="file"
-                accept=".txt,.pdf"
+                accept=".txt,.pdf,text/plain,application/pdf"
                 onChange={handleFileUpload}
                 className="file-input"
               />
@@ -102,7 +110,7 @@ export default function App() {
         <Reader
           text={text}
           pdfDoc={pdfDoc}
-          pdfWords={pdfWords}
+          pageWordStarts={pageWordStarts}
           onReset={handleReset}
           chromeVisible={chromeVisible}
           setChromeVisible={setChromeVisible}

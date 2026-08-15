@@ -1,20 +1,28 @@
 import * as pdfjsLib from "pdfjs-dist/build/pdf";
 import pdfWorker from "pdfjs-dist/build/pdf.worker?url";
-import { extractWordsFromPdf } from "./pdfTextExtractor";
+import { extractPdfTextIndex } from "./pdfTextExtractor";
 import { cleanText } from "./textParser";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 export async function parseFile(file) {
-  if (file.type === "application/pdf") {
+  const isPdf =
+    file.type === "application/pdf" ||
+    file.name.toLowerCase().endsWith(".pdf");
+
+  const isText =
+    file.type === "text/plain" ||
+    file.name.toLowerCase().endsWith(".txt");
+
+  if (isPdf) {
     return await parsePDF(file);
   }
 
-  if (file.type === "text/plain") {
+  if (isText) {
     return {
       text: cleanText(await file.text()),
       pdfDoc: null,
-      pdfWords: [],
+      pageWordStarts: [],
     };
   }
 
@@ -22,18 +30,15 @@ export async function parseFile(file) {
 }
 
 async function parsePDF(file) {
-  const objectUrl = URL.createObjectURL(file);
+  // Load the bytes into PDF.js directly. This keeps later page rendering safe
+  // after parseFile returns; a revoked blob URL can break lazy page access.
+  const data = new Uint8Array(await file.arrayBuffer());
+  const pdfDoc = await pdfjsLib.getDocument({ data }).promise;
+  const { text, pageWordStarts } = await extractPdfTextIndex(pdfDoc);
 
-  try {
-    const pdfDoc = await pdfjsLib.getDocument(objectUrl).promise;
-    const pdfWords = await extractWordsFromPdf(pdfDoc);
-
-    return {
-      text: cleanText(pdfWords.map((word) => word.text).join(" ")),
-      pdfDoc,
-      pdfWords,
-    };
-  } finally {
-    URL.revokeObjectURL(objectUrl);
-  }
+  return {
+    text: cleanText(text),
+    pdfDoc,
+    pageWordStarts,
+  };
 }

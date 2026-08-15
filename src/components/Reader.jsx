@@ -7,7 +7,7 @@ import { splitWords, getDelay } from "../utils/textParser";
 export default function Reader({
   text,
   pdfDoc,
-  pdfWords = [],
+  pageWordStarts = [],
   onReset,
   chromeVisible,
   setChromeVisible,
@@ -129,7 +129,29 @@ export default function Reader({
     }
   };
 
-  const activePdfWord = pdfWords[index];
+  const activePdfPage = (() => {
+    if (!pdfDoc || pageWordStarts.length < 2) return 1;
+
+    // Find the page whose [start, nextStart) range contains this word index.
+    let low = 0;
+    let high = pageWordStarts.length - 2;
+
+    while (low <= high) {
+      const mid = Math.floor((low + high) / 2);
+      const start = pageWordStarts[mid];
+      const end = pageWordStarts[mid + 1];
+
+      if (index < start) {
+        high = mid - 1;
+      } else if (index >= end) {
+        low = mid + 1;
+      } else {
+        return mid + 1;
+      }
+    }
+
+    return Math.min(Math.max(low + 1, 1), pdfDoc.numPages);
+  })();
 
   return (
     <div
@@ -144,8 +166,9 @@ export default function Reader({
       {pdfDoc && !isFocusMode && (
         <PDFViewer
           pdfDoc={pdfDoc}
-          activeWord={activePdfWord}
-          words={pdfWords}
+          activePage={activePdfPage}
+          activeGlobalIndex={index}
+          pageWordStarts={pageWordStarts}
           onWordClick={handlePdfWordClick}
         />
       )}

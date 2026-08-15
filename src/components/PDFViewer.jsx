@@ -1,21 +1,33 @@
 import { useEffect, useRef, useState } from "react";
-import { SCALE } from "../utils/pdfTextExtractor";
+import {
+  SCALE,
+  extractWordsFromPdfPage,
+} from "../utils/pdfTextExtractor";
 
-function PDFPage({ pdfDoc, pageNumber, activeWord, words, onWordClick }) {
+const PAGE_WINDOW_RADIUS = 1;
+
+function PDFPage({
+  pdfDoc,
+  pageNumber,
+  activePage,
+  activeGlobalIndex,
+  pageWordStart,
+  onWordClick,
+}) {
   const canvasRef = useRef(null);
-
-  const [pageSize, setPageSize] = useState({
-    width: 0,
-    height: 0,
-  });
+  const pageRef = useRef(null);
+  const [pageSize, setPageSize] = useState({ width: 0, height: 0 });
+  const [pageWords, setPageWords] = useState([]);
 
   useEffect(() => {
+    let cancelled = false;
+    let renderTask = null;
+
     async function renderPage() {
       const page = await pdfDoc.getPage(pageNumber);
+      const viewport = page.getViewport({ scale: SCALE });
 
-      const viewport = page.getViewport({
-        scale: SCALE,
-      });
+      if (cancelled) return;
 
       setPageSize({
         width: viewport.width,
@@ -23,30 +35,59 @@ function PDFPage({ pdfDoc, pageNumber, activeWord, words, onWordClick }) {
       });
 
       const canvas = canvasRef.current;
-      const context = canvas.getContext("2d");
+      if (!canvas) return;
 
+      const context = canvas.getContext("2d");
       canvas.width = viewport.width;
       canvas.height = viewport.height;
-
       canvas.style.width = `${viewport.width}px`;
       canvas.style.height = `${viewport.height}px`;
 
-      await page.render({
+      renderTask = page.render({
         canvasContext: context,
         viewport,
-      }).promise;
+      });
+
+      const [{ words }] = await Promise.all([
+        extractWordsFromPdfPage(pdfDoc, pageNumber),
+        renderTask.promise,
+      ]);
+
+      if (!cancelled) {
+        setPageWords(words);
+      }
     }
 
-    renderPage();
+    renderPage().catch((error) => {
+      if (error?.name !== "RenderingCancelledException") {
+        console.error(`Failed to render PDF page ${pageNumber}:`, error);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      renderTask?.cancel();
+    };
   }, [pdfDoc, pageNumber]);
 
-  const showHighlight =
-    activeWord && activeWord.page === pageNumber;
+  useEffect(() => {
+    if (pageNumber !== activePage) return;
 
-  const pageWords = words.filter((word) => word.page === pageNumber);
+    pageRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }, [activePage, pageNumber]);
+
+  const activeLocalIndex =
+    pageNumber === activePage ? activeGlobalIndex - pageWordStart : -1;
+
+  const activeWord =
+    activeLocalIndex >= 0 ? pageWords[activeLocalIndex] : null;
 
   return (
     <div
+      ref={pageRef}
       className="pdf-page"
       style={{
         width: `${pageSize.width}px`,
@@ -55,7 +96,7 @@ function PDFPage({ pdfDoc, pageNumber, activeWord, words, onWordClick }) {
     >
       <canvas ref={canvasRef} />
 
-      {showHighlight && (
+      {activeWord && (
         <div
           className="word-highlight"
           style={{
@@ -67,12 +108,12 @@ function PDFPage({ pdfDoc, pageNumber, activeWord, words, onWordClick }) {
         />
       )}
 
-      {pageWords.map((word, wordIndex) => {
-        const globalIndex = words.indexOf(word);
+      {pageWords.map((word, localIndex) => {
+        const globalIndex = pageWordStart + localIndex;
 
         return (
           <button
-            key={`${word.page}-${globalIndex}-${wordIndex}`}
+            key={`${pageNumber}-${localIndex}`}
             type="button"
             className="pdf-word-hitbox"
             style={{
@@ -92,23 +133,26 @@ function PDFPage({ pdfDoc, pageNumber, activeWord, words, onWordClick }) {
 
 export default function PDFViewer({
   pdfDoc,
-  activeWord,
-  words = [],
+  activePage,
+  activeGlobalIndex,
+  pageWordStarts = [],
   onWordClick,
   focusMode = false,
 }) {
   if (!pdfDoc) {
-    return (
-      <div className="pdf-empty">
-        Upload a PDF
-      </div>
-    );
+    return <div className="pdf-empty">Upload a PDF</div>;
   }
 
-  const pages = Array.from(
-    { length: pdfDoc.numPages },
-    (_, i) => i + 1
+  const firstPage = Math.max(1, activePage - PAGE_WINDOW_RADIUS);
+  const lastPage = Math.min(
+    pdfDoc.numPages,
+    activePage + PAGE_WINDOW_RADIUS
   );
+
+  const pages = [];
+  for (let pageNumber = firstPage; pageNumber <= lastPage; pageNumber++) {
+    pages.push(pageNumber);
+  }
 
   return (
     <section className={`pdf-viewer ${focusMode ? "is-hidden" : ""}`.trim()}>
@@ -117,8 +161,9 @@ export default function PDFViewer({
           key={pageNumber}
           pdfDoc={pdfDoc}
           pageNumber={pageNumber}
-          activeWord={activeWord}
-          words={words}
+          activePage={activePage}
+          activeGlobalIndex={activeGlobalIndex}
+          pageWordStart={pageWordStarts[pageNumber - 1] ?? 0}
           onWordClick={onWordClick}
         />
       ))}
