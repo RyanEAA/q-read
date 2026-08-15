@@ -20,7 +20,7 @@ export async function parseFile(file) {
 
   if (isText) {
     return {
-      text: cleanText(await file.text()),
+      text: cleanText(await readFileAsText(file)),
       pdfDoc: null,
       pageWordStarts: [],
     };
@@ -42,6 +42,22 @@ function readFileAsArrayBuffer(file) {
     };
 
     reader.readAsArrayBuffer(file);
+  });
+}
+
+function readFileAsText(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      resolve(reader.result);
+    };
+
+    reader.onerror = () => {
+      reject(reader.error || new Error("Failed to read file"));
+    };
+
+    reader.readAsText(file);
   });
 }
 
