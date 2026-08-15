@@ -29,12 +29,32 @@ export async function parseFile(file) {
   throw new Error("Unsupported file type");
 }
 
+function readFileAsArrayBuffer(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      resolve(reader.result);
+    };
+
+    reader.onerror = () => {
+      reject(reader.error || new Error("Failed to read file"));
+    };
+
+    reader.readAsArrayBuffer(file);
+  });
+}
+
 async function parsePDF(file) {
-  // Load the bytes into PDF.js directly. This keeps later page rendering safe
-  // after parseFile returns; a revoked blob URL can break lazy page access.
-  const data = new Uint8Array(await file.arrayBuffer());
-  const pdfDoc = await pdfjsLib.getDocument({ data }).promise;
-  const { text, pageWordStarts } = await extractPdfTextIndex(pdfDoc);
+  const arrayBuffer = await readFileAsArrayBuffer(file);
+  const data = new Uint8Array(arrayBuffer);
+
+  const pdfDoc = await pdfjsLib.getDocument({
+    data,
+  }).promise;
+
+  const { text, pageWordStarts } =
+    await extractPdfTextIndex(pdfDoc);
 
   return {
     text: cleanText(text),
